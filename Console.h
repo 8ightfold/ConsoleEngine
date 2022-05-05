@@ -3,8 +3,8 @@
 
 #include <Windows.h>
 
-#define DW 4
-#define DH 4
+#define DW 8
+#define DH 8
 
 typedef struct ConsoleDimensions {
 	int WIDTH, HEIGHT;
@@ -35,7 +35,7 @@ int InitalizeConsole (ConWrap* CW) {
 	CW->CD.WIDTH = GetDeviceCaps(GetDC(NULL), HORZRES), CW->CD.HEIGHT = GetDeviceCaps(GetDC(NULL), VERTRES);
 	CW->CD.cWIDTH = CW->CD.WIDTH, CW->CD.cHEIGHT = CW->CD.HEIGHT;									//	Console dimensions
 	CW->CD.dW = DW, CW->CD.dH = DH;																	//	Size of characters
-	CW->CD.bWIDTH = CW->CD.cWIDTH / CW->CD.dW, CW->CD.bHEIGHT = CW->CD.cHEIGHT / CW->CD.dH;		//	Number of characters
+	CW->CD.bWIDTH = CW->CD.cWIDTH / CW->CD.dW, CW->CD.bHEIGHT = CW->CD.cHEIGHT / CW->CD.dH;			//	Number of characters
 	CW->CD.bAREA = CW->CD.bWIDTH * CW->CD.bHEIGHT;
 
 	CW->buf = (unsigned short*)calloc(CW->CD.bAREA, sizeof(short));
@@ -47,8 +47,6 @@ int InitalizeConsole (ConWrap* CW) {
 	CW->CT.Coords.X = 0;
 	CW->CT.Coords.Y = 0;
 	CW->CT.PtrCW = (LPDWORD)malloc(sizeof(DWORD));
-
-	MoveWindow(CW->CT.COutHandle, 0, 0, CW->CD.WIDTH, CW->CD.HEIGHT, TRUE);
 
 	//	Console Font Size
 	CONSOLE_FONT_INFOEX cf = { 0 };
@@ -70,10 +68,11 @@ int InitalizeConsole (ConWrap* CW) {
 	info.dwSize = 100;
 	info.bVisible = FALSE;
 
-	SetConsoleScreenBufferSize(CW->CT.COutHandle, csbi.dwSize);				//	Creates screen buffer
-	SetCurrentConsoleFontEx(CW->CT.COutHandle, 0, &cf);						//	Sets font size
+	SetConsoleMode(CW->CT.COutHandle, ENABLE_PROCESSED_OUTPUT);
+	SetConsoleScreenBufferSize(CW->CT.COutHandle, csbi.dwSize);					//	Creates screen buffer
+	SetCurrentConsoleFontEx(CW->CT.COutHandle, 0, &cf);							//	Sets font size
 	SetConsoleDisplayMode(CW->CT.COutHandle, CONSOLE_FULLSCREEN_MODE, 0);		//	Go fullscreen
-	SetConsoleCursorInfo(CW->CT.COutHandle, &info);							//	Hide cursor
+	SetConsoleCursorInfo(CW->CT.COutHandle, &info);								//	Hide cursor
 	ShowScrollBar(CW->CT.Console, SB_BOTH, FALSE);								//	Hide scrollbar
 
 	return 0;
